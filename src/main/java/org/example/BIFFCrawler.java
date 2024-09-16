@@ -47,6 +47,7 @@ public class BIFFCrawler {
 
                 if (theaterElement != null) {
                     String theater = theaterElement.text();
+                    System.out.println("parsing movies from " + theater);
                     // Create a new row and fill in the data
                     Row row = sheet.createRow(rowIdx++);
                     row.setHeightInPoints(73);
@@ -138,15 +139,18 @@ public class BIFFCrawler {
         }
     }
     private static int extractItNumber(String className) {
-        // Extract the number after 'it' in the class name (e.g., "sch_it sch_it4")
-        String[] parts = className.split(" ");
+        // Extract the number after 'sch_it' in the class name (e.g., "sch_it sch_it4")
+        String[] parts = className.split("\\s+");
         for (String part : parts) {
             if (part.startsWith("sch_it")) {
-                try {
-                    return Integer.parseInt(part.substring(6));
-                } catch (NumberFormatException e) {
-                    // Handle the case where parsing to int fails
-                    return 0;
+                String numberPart = part.substring(6); // After 'sch_it'
+                if (numberPart.matches("\\d+")) {
+                    try {
+                        return Integer.parseInt(numberPart);
+                    } catch (NumberFormatException e) {
+                        // Continue to next part if parsing fails
+                        continue;
+                    }
                 }
             }
         }
